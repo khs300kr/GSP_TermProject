@@ -16,7 +16,7 @@ using namespace std;
 #define WINDOW_CLASS_NAME L"WINXCLASS"  // class name
 
 #define WINDOW_WIDTH    900   // size of window
-#define WINDOW_HEIGHT   700
+#define WINDOW_HEIGHT   710
 
 #define	BUF_SIZE				1024
 #define	WM_SOCKET				WM_USER + 1
