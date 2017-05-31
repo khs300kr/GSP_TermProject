@@ -1,5 +1,0 @@
-﻿  server_main.cpp
-c:\users\lincoln\desktop\게임서버_텀프로젝트\gameserver_termproject(server)\gameserver_termproject(server)\server_main.cpp(397): warning C4244: '인수': 'unsigned __int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\lincoln\desktop\게임서버_텀프로젝트\gameserver_termproject(server)\gameserver_termproject(server)\server_main.cpp(402): warning C4244: '인수': 'unsigned __int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  GameServer_TermProject(Server).vcxproj -> C:\Users\Lincoln\Desktop\게임서버_텀프로젝트\GameServer_TermProject(Server)\x64\Debug\GameServer_TermProject(Server).exe
-  GameServer_TermProject(Server).vcxproj -> C:\Users\Lincoln\Desktop\게임서버_텀프로젝트\GameServer_TermProject(Server)\x64\Debug\GameServer_TermProject(Server).pdb (Full PDB)
