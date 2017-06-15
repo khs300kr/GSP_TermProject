@@ -6,8 +6,7 @@
 
 // 시야간격 3
 #define VIEW_RADIUS   3
-
-#define MAX_USER 10
+#define MAX_USER 1000
 
 #define NPC_START  1000
 #define NUM_OF_NPC  10000
@@ -15,20 +14,30 @@
 #define MY_SERVER_PORT  7000
 
 #define MAX_STR_SIZE  100
+#define MAX_ID_LEN 10
 
-#define CS_DOWN		0
-#define CS_LEFT		1
-#define CS_RIGHT	2
-#define CS_UP		3
-#define CS_CHAT		5
 
-#define SC_PUT_PLAYER    1
-#define SC_REMOVE_PLAYER 2
-#define SC_CHAT			 3
-#define SC_DOWN			 4
-#define SC_LEFT			 5
-#define SC_RIGHT		 6
-#define SC_UP			 7
+// Client -> Server
+#define CS_LOGIN	0
+#define CS_DOWN		1
+#define CS_LEFT		2
+#define CS_RIGHT	3
+#define CS_UP		4
+#define CS_ATTACK	5
+#define CS_CHAT		6
+#define CS_LOGOUT	7
+
+// Server -> Client
+#define SC_DOWN			 0
+#define SC_LEFT			 1
+#define SC_RIGHT		 2
+#define SC_UP			 3
+#define SC_LOGIN_FAIL	 4
+#define SC_PUT_PLAYER    5
+#define SC_CHAT			 6
+#define SC_STAT_CHANGE   7
+#define SC_ADD_OBJECT    8
+#define SC_REMOVE_OBJECT 9
 
 
 
@@ -40,6 +49,18 @@ struct cs_packet_up {
 	BYTE type;
 };
 
+struct cs_packet_login {
+	BYTE size;
+	BYTE type;
+	WCHAR GAME_ID[MAX_ID_LEN];
+};
+
+struct cs_packet_logout {
+	BYTE size;
+	BYTE type;
+	WCHAR GAME_ID[MAX_ID_LEN];
+};
+
 struct cs_packet_chat {
 	BYTE size;
 	BYTE type;
@@ -47,10 +68,15 @@ struct cs_packet_chat {
 };
 
 // Server -> Client
+struct sc_packet_login_fail {
+	BYTE size;
+	BYTE type;
+};
+
 struct sc_packet_pos {
 	BYTE size;
 	BYTE type;
-	WORD id;
+	WORD id;	
 	WORD x;
 	WORD y;
 	WORD dir;

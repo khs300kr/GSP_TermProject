@@ -142,11 +142,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DBFunc.cpp" />
+    <ClCompile Include="Global.cpp" />
+    <ClCompile Include="PacketFunc.cpp" />
     <ClCompile Include="server_main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DBFunc.h" />
+    <ClInclude Include="define.h" />
+    <ClInclude Include="Global.h" />
+    <ClInclude Include="PacketFunc.h" />
     <ClInclude Include="protocol.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

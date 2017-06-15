@@ -40,14 +40,16 @@ void OnRender(HWND hWnd, HDC hDC, HDC memdc)
 	}
 
 	SelectObject(memdc, hPlayer);
-	TransparentBlt(hDC, (g_Player.m_iX * 32) - 7, (g_Player.m_iY * 32) - 21, 46, 51, memdc, (g_Player.m_iFrameX * 46),
-		(g_Player.m_iFrameY * 51), 46, 51, RGB(255, 0, 255));
+	if(g_Player.m_bConnected == true)
+		TransparentBlt(hDC, (g_Player.m_iX * 32) - 7, (g_Player.m_iY * 32) - 21, 46, 51, memdc, (g_Player.m_iFrameX * 46),
+			(g_Player.m_iFrameY * 51), 46, 51, RGB(255, 0, 255));
 
 	SelectObject(memdc, hOther);
 	for (int i = 0; i < MAX_USER; ++i)
 	{
-		TransparentBlt(hDC, (g_OtherPlayer[i].m_iX * 32) - 7, (g_OtherPlayer[i].m_iY * 32) - 21, 46, 51, memdc, (g_OtherPlayer[i].m_iFrameX * 48),
-			(g_OtherPlayer[i].m_iFrameY * 50), 48, 50, RGB(255, 0, 255));
+		if(g_OtherPlayer[i].m_bConnected == true)
+			TransparentBlt(hDC, (g_OtherPlayer[i].m_iX * 32) - 7, (g_OtherPlayer[i].m_iY * 32) - 21, 46, 51, memdc, (g_OtherPlayer[i].m_iFrameX * 48),
+				(g_OtherPlayer[i].m_iFrameY * 50), 48, 50, RGB(255, 0, 255));
 
 	}
 
@@ -86,23 +88,35 @@ void ProcessPacket(char *ptr)
 	static bool first_time = true;
 	switch (ptr[1])
 	{
+	case SC_LOGIN_FAIL:
+	{
+		cout << "로그인 실패 다시 입력해주세요. \n";
+		break;
+	}
 	case SC_PUT_PLAYER:
 	{
+		cout << "로그인 성공.\n";
 		sc_packet_put_player *my_packet = reinterpret_cast<sc_packet_put_player *>(ptr);
 		int id = my_packet->id;
 		if (first_time) {
+			g_login = true;
 			first_time = false;
 			g_myid = id;
 		}
 		if (id == g_myid) {
+			g_Player.m_bConnected = true;
 			g_Player.m_iX = my_packet->x;
 			g_Player.m_iY = my_packet->y;
+			g_Player.m_iFrameY = my_packet->dir;
 			//g_Player.m_iFrameY = my_packet->dir;
 			//player.attr |= BOB_ATTR_VISIBLE;
-		}
+		}	
 		else if (id < NPC_START) {
+			g_OtherPlayer[id].m_bConnected = true;
 			g_OtherPlayer[id].m_iX = my_packet->x;
 			g_OtherPlayer[id].m_iY = my_packet->y;
+			g_OtherPlayer[id].m_iFrameY = my_packet->dir;
+
 			//skelaton[id].attr |= BOB_ATTR_VISIBLE;
 		}
 		//else {
@@ -113,21 +127,22 @@ void ProcessPacket(char *ptr)
 		break;
 	}
 	//case SC_POS:
-	case SC_DOWN: SetPlayerPosition(0,ptr); break;
+	case SC_DOWN: SetPlayerPosition(0, ptr); break;
 	case SC_LEFT: SetPlayerPosition(1, ptr); break;
 	case SC_RIGHT:SetPlayerPosition(2, ptr); break;
 	case SC_UP:   SetPlayerPosition(3, ptr); break;
 
-	case SC_REMOVE_PLAYER:
+	case SC_REMOVE_OBJECT:
 	{
 		sc_packet_remove_player *my_packet = reinterpret_cast<sc_packet_remove_player *>(ptr);
 		int other_id = my_packet->id;
-		//if (other_id == g_myid) {
-		//	player.attr &= ~BOB_ATTR_VISIBLE;
-		//}
-		//else if (other_id < NPC_START) {
-		//	skelaton[other_id].attr &= ~BOB_ATTR_VISIBLE;
-		//}
+		if (other_id == g_myid) {
+			g_Player.m_bConnected = false;
+		}
+		else if (other_id < NPC_START) {
+			g_OtherPlayer[other_id].m_bConnected = false;
+
+		}
 		//else {
 		//	npc[other_id - NPC_START].attr &= ~BOB_ATTR_VISIBLE;
 		//}
@@ -202,9 +217,9 @@ void SetPlayerPosition(int dir, char *ptr)
 		g_Player.m_iY = my_packet->y;
 	}
 	else if (other_id < NPC_START) {
+		g_OtherPlayer[other_id].m_iFrameY = dir;
 		g_OtherPlayer[other_id].m_iX = my_packet->x;
 		g_OtherPlayer[other_id].m_iY = my_packet->y;
-		g_OtherPlayer[other_id].m_iFrameY = dir;
 	}
 	//else {
 	//	npc[other_id - NPC_START].x = my_packet->x;

@@ -42,11 +42,15 @@ struct Player {
 	int	m_iY;
 	int	m_iFrameX;
 	int	m_iFrameY;
+	TCHAR ID[MAX_ID_LEN];
+	bool m_bConnected;
 };
 
 extern RECT	  g_windowrect;
 extern Player g_Player;
 extern Player g_OtherPlayer[MAX_USER];
+
+extern bool g_login;
 
 extern int	  g_LeftX;
 extern int	  g_TopY;
