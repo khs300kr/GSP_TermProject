@@ -2,7 +2,6 @@
 
 // Contents Logic
 bool Is_Close(int from, int to);
-
 // Server Logic
 void Send_Packet(int client, void* packet);
 void ProcessPacket(int id, unsigned char packet[]);
@@ -21,3 +20,4 @@ void ViewListSend(int id, unsigned char packet[]);
 // Ingame
 void SendChatPacket(int client, WCHAR id[], WCHAR message[]);
 void SendAttackPacket(int client, int object);
+

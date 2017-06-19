@@ -184,6 +184,7 @@ int main()
 {
 	Init_Server();
 	Init_DB();
+	CreateMapFile(); // MAP 파일 불러오기.
 
 	// 작업자 스레드 생성.
 	std::vector<std::thread *> vWorker_threads;

@@ -1,6 +1,8 @@
 #pragma once
 
 void error_display(char *msg, int err_no);
+void CreateMapFile();
+
 enum OPTYPE { OP_SEND, OP_RECV };
 
 struct OverlappedEx
@@ -53,3 +55,6 @@ extern SQLHENV henv;
 extern SQLHDBC hdbc;
 extern SQLHSTMT hstmt;
 extern SQLRETURN retcode;
+
+// Map
+extern int map[300][300];

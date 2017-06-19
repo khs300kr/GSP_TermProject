@@ -161,6 +161,7 @@
     <Image Include="Resources\Other.bmp" />
     <Image Include="Resources\Player.bmp" />
     <Image Include="Resources\temp_map.bmp" />
+    <Image Include="Resources\tile.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

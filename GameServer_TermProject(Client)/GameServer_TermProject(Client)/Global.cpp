@@ -26,3 +26,6 @@ int	   g_GameScene{};
 TCHAR str[CHAT_LENGTH]{};
 SIZE  lensize{};
 vector<wstring> vOutput{};
+
+// Map
+int map[300][300]{};

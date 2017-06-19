@@ -5,26 +5,18 @@ HBITMAP hBackGround{};
 HBITMAP hPlayer{};
 HBITMAP hOther{};
 HBITMAP hMainMenu{};
+HBITMAP hTile{};
 wstring chat_maker;
 int iLine;
 int iFrontRange;
 
 void OnCreate(HINSTANCE g_hInst, HWND hWnd)
 {
-	//for (int i = 0; i <BOARD_HEIGHT; i++) //¿­ °¹¼ö
-	//{
-	//	for (int j = 0; j < BOARD_WIDTH; j++) //Çà°¹¼ö
-	//	{
-	//		sector[i][j].m_iX = iWidth;
-	//		sector[i][j].m_iY = iHeight;
-	//		if (iWidth)
-	//			iWidth += 50;
-	//	}
-	//}
 	hBackGround = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP1));
 	hPlayer = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP3));
 	hOther = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP4));
 	hMainMenu = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP5));
+	hTile = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP6));
 }
 
 
@@ -47,11 +39,63 @@ void OnRender(HWND hWnd, HDC hDC, HDC memdc)
 	{
 		// Temporary Map
 		SelectObject(memdc, hBackGround);
-		// Temp
-		//StretchBlt(hDC, g_LeftX, g_TopY, g_LeftX + 640, g_TopY + 640, memdc, 0, 0, 1008, 689, SRCCOPY);
-		// Back
 		BitBlt(hDC, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memdc, 0, 0, SRCCOPY);
 		
+		// Map
+		SelectObject(memdc,hTile);
+		for (int i = 0; i < 20; ++i){
+			for (int j = 0; j < 20; ++j)
+			{
+				int tile_x = i + g_LeftX;
+				int tile_y = j + g_TopY;
+				if ((tile_x < 0) || (tile_y < 0) || (tile_x >= 300) || (tile_y >= 300)) continue;
+				if((map[tile_y][tile_x] < 17))
+					StretchBlt(hDC, TILEWIDTH * i , TILEWIDTH * j, TILEWIDTH, TILEWIDTH,
+						memdc, (int(map[tile_y][tile_x] -1) % 16) * TILEWIDTH, (int(map[tile_y][tile_x] / 17)) * TILEWIDTH,
+						TILEWIDTH, TILEWIDTH, SRCCOPY);
+				else if ((map[tile_y][tile_x] < 49))
+					StretchBlt(hDC, TILEWIDTH * i, TILEWIDTH * j, TILEWIDTH, TILEWIDTH,
+						memdc, (int(map[tile_y][tile_x] - 1) % 16) * TILEWIDTH, (int(map[tile_y][tile_x] + 1) / 17) * TILEWIDTH,
+						TILEWIDTH, TILEWIDTH, SRCCOPY);
+				else if ((map[tile_y][tile_x] < 65))
+					StretchBlt(hDC, TILEWIDTH * i, TILEWIDTH * j, TILEWIDTH, TILEWIDTH,
+						memdc, (int(map[tile_y][tile_x] - 1) % 16) * TILEWIDTH, (int(map[tile_y][tile_x]+2) / 17) * TILEWIDTH,
+						TILEWIDTH, TILEWIDTH, SRCCOPY);
+				else if ((map[tile_y][tile_x] < 81))
+					StretchBlt(hDC, TILEWIDTH * i, TILEWIDTH * j, TILEWIDTH, TILEWIDTH,
+						memdc, (int(map[tile_y][tile_x] - 1) % 16) * TILEWIDTH, (int(map[tile_y][tile_x] +3) / 17) * TILEWIDTH,
+						TILEWIDTH, TILEWIDTH, SRCCOPY);
+				else if ((map[tile_y][tile_x] < 97))
+					StretchBlt(hDC, TILEWIDTH * i, TILEWIDTH * j, TILEWIDTH, TILEWIDTH,
+						memdc, (int(map[tile_y][tile_x] - 1) % 16) * TILEWIDTH, (int(map[tile_y][tile_x]+ 4) / 17) * TILEWIDTH,
+						TILEWIDTH, TILEWIDTH, SRCCOPY);
+				else if ((map[tile_y][tile_x] < 113))
+					StretchBlt(hDC, TILEWIDTH * i, TILEWIDTH * j, TILEWIDTH, TILEWIDTH,
+						memdc, (int(map[tile_y][tile_x] - 1) % 16) * TILEWIDTH, (int(map[tile_y][tile_x] +5)/ 17) * TILEWIDTH,
+						TILEWIDTH, TILEWIDTH, SRCCOPY);
+				else if ((map[tile_y][tile_x] < 129))
+					StretchBlt(hDC, TILEWIDTH * i, TILEWIDTH * j, TILEWIDTH, TILEWIDTH,
+						memdc, (int(map[tile_y][tile_x] - 1) % 16) * TILEWIDTH, (int(map[tile_y][tile_x] + 6) / 17) * TILEWIDTH,
+						TILEWIDTH, TILEWIDTH, SRCCOPY);
+				else if ((map[tile_y][tile_x] < 145))
+					StretchBlt(hDC, TILEWIDTH * i, TILEWIDTH * j, TILEWIDTH, TILEWIDTH,
+						memdc, (int(map[tile_y][tile_x] - 1) % 16) * TILEWIDTH, (int(map[tile_y][tile_x] + 7) / 17) * TILEWIDTH,
+						TILEWIDTH, TILEWIDTH, SRCCOPY);
+				else if ((map[tile_y][tile_x] < 161))
+					StretchBlt(hDC, TILEWIDTH * i, TILEWIDTH * j, TILEWIDTH, TILEWIDTH,
+						memdc, (int(map[tile_y][tile_x] - 1) % 16) * TILEWIDTH, (int(map[tile_y][tile_x] + 8) / 17) * TILEWIDTH,
+						TILEWIDTH, TILEWIDTH, SRCCOPY);
+				else if ((map[tile_y][tile_x] < 177))
+					StretchBlt(hDC, TILEWIDTH * i, TILEWIDTH * j, TILEWIDTH, TILEWIDTH,
+						memdc, (int(map[tile_y][tile_x] - 1) % 16) * TILEWIDTH, (int(map[tile_y][tile_x] + 9) / 17) * TILEWIDTH,
+						TILEWIDTH, TILEWIDTH, SRCCOPY);
+				else if ((map[tile_y][tile_x] < 193))
+					StretchBlt(hDC, TILEWIDTH * i, TILEWIDTH * j, TILEWIDTH, TILEWIDTH,
+						memdc, (int(map[tile_y][tile_x] - 1) % 16) * TILEWIDTH, (int(map[tile_y][tile_x] + 10) / 17) * TILEWIDTH,
+						TILEWIDTH, TILEWIDTH, SRCCOPY);
+			}
+		}
+
 		// UI Draw
 		SetBkMode(hDC, TRANSPARENT);
 		SetTextColor(hDC, RGB(255, 255, 255));
@@ -75,7 +119,6 @@ void OnRender(HWND hWnd, HDC hDC, HDC memdc)
 		TextOut(hDC, 5, 645, str, int(wcslen(str)));
 
 
-
 		// Grid Draw
 		for (int i = 0; i < 20; ++i)
 		{
@@ -90,14 +133,14 @@ void OnRender(HWND hWnd, HDC hDC, HDC memdc)
 		// Object Draw
 		SelectObject(memdc, hPlayer);
 		if (g_Player.m_bConnected == true)
-			TransparentBlt(hDC, (g_Player.m_iX * 32) - 7, (g_Player.m_iY * 32) - 21, 46, 51, memdc, (g_Player.m_iFrameX * 46),
+			TransparentBlt(hDC, 314, 294 , 46, 51, memdc, (g_Player.m_iFrameX * 46),
 			(g_Player.m_iFrameY * 51), 46, 51, RGB(255, 0, 255));
 
 		SelectObject(memdc, hOther);
 		for (int i = 0; i < MAX_USER; ++i)
 		{
 			if (g_OtherPlayer[i].m_bConnected == true)
-				TransparentBlt(hDC, (g_OtherPlayer[i].m_iX * 32) - 7, (g_OtherPlayer[i].m_iY * 32) - 21, 46, 51, memdc, (g_OtherPlayer[i].m_iFrameX * 48),
+				TransparentBlt(hDC, ((g_OtherPlayer[i].m_iX - g_LeftX) * 32) - 6, ((g_OtherPlayer[i].m_iY - g_TopY) * 32) - 22, 46, 51, memdc, (g_OtherPlayer[i].m_iFrameX * 48),
 				(g_OtherPlayer[i].m_iFrameY * 50), 48, 50, RGB(255, 0, 255));
 		}
 	}
@@ -125,7 +168,7 @@ void OnDestory(HWND hWnd)
 {
 	DeleteObject(hMainMenu); DeleteObject(hBackGround);
 	DeleteObject(hPlayer); 	DeleteObject(hOther);
-
+	DeleteObject(hTile);
 	KillTimer(hWnd, 0/*uIDEvent*/);
 }
 
@@ -162,6 +205,8 @@ void ProcessPacket(char *ptr)
 			g_login = true;
 			first_time = false;
 			g_myid = id;
+			g_LeftX = my_packet->x - 10;
+			g_TopY = my_packet->y - 10;
 		}
 		if (id == g_myid) {
 			g_Player.m_bConnected = true;
@@ -276,6 +321,8 @@ void SetPlayerPosition(int dir, char *ptr)
 		g_Player.m_iFrameY = dir;
 		g_Player.m_iX = my_packet->x;
 		g_Player.m_iY = my_packet->y;
+		g_LeftX = my_packet->x - 10;
+		g_TopY = my_packet->y - 10;
 	}
 	else if (other_id < NPC_START) {
 		g_OtherPlayer[other_id].m_iFrameY = dir;

@@ -9,9 +9,10 @@ bool Is_Close(int from, int to)
 	//	* (g_Clients[from].m_iX - g_Clients[to].m_iX)
 	//	+ (g_Clients[from].m_iY - g_Clients[to].m_iY)
 	//	* (g_Clients[from].m_iY - g_Clients[to].m_iY) <= VIEW_RADIUS * VIEW_RADIUS; 
-	return ((abs(g_Clients[from].m_iX - g_Clients[to].m_iX) < 7) &&
-		(abs(g_Clients[from].m_iY - g_Clients[to].m_iY) < 7));
+	return ((abs(g_Clients[from].m_iX - g_Clients[to].m_iX) < 10) &&
+		(abs(g_Clients[from].m_iY - g_Clients[to].m_iY) < 10));
 }
+
 
 void Send_Packet(int client, void* packet)
 {
@@ -196,20 +197,50 @@ void ProcessPacket(int id, unsigned char packet[])
 	switch (packet[1])
 	{
 	case CS_UP:
-		if (g_Clients[id].m_iY > 0 && g_Clients[id].m_Dir == SC_UP) g_Clients[id].m_iY--;
-		g_Clients[id].m_Dir = SC_UP; ViewListSend(id, packet);
+		if (map[g_Clients[id].m_iY - 1][g_Clients[id].m_iX] != 3 && map[g_Clients[id].m_iY  - 1][g_Clients[id].m_iX] != 4 &&
+			map[g_Clients[id].m_iY - 1][g_Clients[id].m_iX] != 19 && map[g_Clients[id].m_iY - 1][g_Clients[id].m_iX] != 20 &&
+			map[g_Clients[id].m_iY - 1][g_Clients[id].m_iX] != 34 && map[g_Clients[id].m_iY - 1][g_Clients[id].m_iX] != 35 &&
+			map[g_Clients[id].m_iY - 1][g_Clients[id].m_iX] != 58 && map[g_Clients[id].m_iY - 1][g_Clients[id].m_iX] != 57 &&
+			map[g_Clients[id].m_iY - 1][g_Clients[id].m_iX] != 10 && map[g_Clients[id].m_iY - 1][g_Clients[id].m_iX] != 9)
+		{
+			if (g_Clients[id].m_iY > 0 && g_Clients[id].m_Dir == SC_UP) g_Clients[id].m_iY--;
+		}
+			g_Clients[id].m_Dir = SC_UP; ViewListSend(id, packet);
 		break;
-	case CS_DOWN: 
-		if (g_Clients[id].m_iY < BOARD_HEIGHT - 1 && g_Clients[id].m_Dir == SC_DOWN) g_Clients[id].m_iY++;
-		g_Clients[id].m_Dir = SC_DOWN; ViewListSend(id, packet);
+	case CS_DOWN:
+		if (map[g_Clients[id].m_iY + 1][g_Clients[id].m_iX] != 3 && map[g_Clients[id].m_iY  + 1][g_Clients[id].m_iX] != 4 &&
+			map[g_Clients[id].m_iY + 1][g_Clients[id].m_iX] != 19 && map[g_Clients[id].m_iY + 1][g_Clients[id].m_iX] != 20 &&
+			map[g_Clients[id].m_iY + 1][g_Clients[id].m_iX] != 34 && map[g_Clients[id].m_iY + 1][g_Clients[id].m_iX] != 35 &&
+			map[g_Clients[id].m_iY + 1][g_Clients[id].m_iX] != 58 && map[g_Clients[id].m_iY + 1][g_Clients[id].m_iX] != 57 &&
+			map[g_Clients[id].m_iY + 1][g_Clients[id].m_iX] != 10 && map[g_Clients[id].m_iY + 1][g_Clients[id].m_iX] != 9)
+		{
+			if (g_Clients[id].m_iY < BOARD_HEIGHT - 1 && g_Clients[id].m_Dir == SC_DOWN) g_Clients[id].m_iY++;
+		}
+			g_Clients[id].m_Dir = SC_DOWN; ViewListSend(id, packet);
 		break;
 	case CS_LEFT:
-		if (g_Clients[id].m_iX > 0 && g_Clients[id].m_Dir == SC_LEFT) g_Clients[id].m_iX--;
-		g_Clients[id].m_Dir = SC_LEFT; ViewListSend(id, packet);
+		if (map[g_Clients[id].m_iY][g_Clients[id].m_iX - 1] != 3 && map[g_Clients[id].m_iY][g_Clients[id].m_iX  - 1] != 4 &&
+			map[g_Clients[id].m_iY][g_Clients[id].m_iX - 1] != 19 && map[g_Clients[id].m_iY][g_Clients[id].m_iX - 1] != 20 &&
+			map[g_Clients[id].m_iY][g_Clients[id].m_iX - 1] != 34 && map[g_Clients[id].m_iY][g_Clients[id].m_iX - 1] != 35 &&
+			map[g_Clients[id].m_iY][g_Clients[id].m_iX - 1] != 58 && map[g_Clients[id].m_iY][g_Clients[id].m_iX - 1] != 57 &&
+			map[g_Clients[id].m_iY][g_Clients[id].m_iX - 1] != 10 && map[g_Clients[id].m_iY][g_Clients[id].m_iX - 1] != 9)
+		{
+			if (g_Clients[id].m_iX > 0 && g_Clients[id].m_Dir == SC_LEFT) g_Clients[id].m_iX--;
+		}
+			g_Clients[id].m_Dir = SC_LEFT; ViewListSend(id, packet);
 		break;
 	case CS_RIGHT:
-		if (g_Clients[id].m_iX < BOARD_WIDTH - 1 && g_Clients[id].m_Dir == SC_RIGHT) g_Clients[id].m_iX++;
-		g_Clients[id].m_Dir = SC_RIGHT; ViewListSend(id, packet);
+		if (map[g_Clients[id].m_iY][g_Clients[id].m_iX + 1] != 3 && map[g_Clients[id].m_iY][g_Clients[id].m_iX + 1] != 4 &&
+			map[g_Clients[id].m_iY][g_Clients[id].m_iX + 1] != 19 && map[g_Clients[id].m_iY][g_Clients[id].m_iX + 1] != 20 &&
+			map[g_Clients[id].m_iY][g_Clients[id].m_iX + 1] != 34 && map[g_Clients[id].m_iY][g_Clients[id].m_iX + 1] != 35 &&
+			map[g_Clients[id].m_iY][g_Clients[id].m_iX + 1] != 58 && map[g_Clients[id].m_iY][g_Clients[id].m_iX + 1] != 57 &&
+			map[g_Clients[id].m_iY][g_Clients[id].m_iX + 1] != 10 && map[g_Clients[id].m_iY][g_Clients[id].m_iX + 1] != 9)
+		{
+
+			cout << map[g_Clients[id].m_iY][g_Clients[id].m_iX] << endl;
+			if (g_Clients[id].m_iX < BOARD_WIDTH - 1 && g_Clients[id].m_Dir == SC_RIGHT) g_Clients[id].m_iX++;
+		}
+			g_Clients[id].m_Dir = SC_RIGHT; ViewListSend(id, packet);
 		break;
 	case CS_LOGIN:
 	{

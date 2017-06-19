@@ -26,3 +26,38 @@ SQLHENV henv{};
 SQLHDBC hdbc{};
 SQLHSTMT hstmt{};
 SQLRETURN retcode{};;
+
+// Map
+int map[300][300]{};
+
+
+
+void CreateMapFile()
+{
+	int width = 0;
+	int height = 0;
+	int count = 1;//10~100ÀÚ¸®
+	FILE* fp = fopen("map.txt", "r");
+
+	if (fp != NULL) {
+		int c;
+		do {
+			c = getc(fp);
+			if (c == ',' || c == EOF) {
+				continue;
+			}
+			else if (c == ' ') {
+				width++;
+				if (width == 300) { width = 0; height++; }
+				count = 1;
+			}
+			else {
+				map[height][width] = map[height][width] * count;
+				map[height][width] += (c - 48);
+				count = 10;
+			}
+		} while (c != EOF);
+	}
+	fclose(fp);
+}
+

@@ -15,8 +15,36 @@ WNDPROC wpOldEditProc;
 void CALLBACK OnTimer(HWND hWnd, UINT uMsg, UINT_PTR uIDEvent, DWORD dwTime);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK EditProc(HWND, UINT, WPARAM, LPARAM);
+void CreateMapFile();
 
+void CreateMapFile()
+{
+	int width = 0;
+	int height = 0;
+	int count = 1;//10~100자리
+	FILE* fp = fopen("Resources\\map.txt", "r");
 
+	if (fp != NULL) {
+		int c;
+		do {
+			c = getc(fp);
+			if (c == ',' || c == EOF) {
+				continue;
+			}
+			else if (c == ' ') {
+				width++;
+				if (width == 300) { width = 0; height++; }
+				count = 1;
+			}
+			else {
+				map[height][width] = map[height][width] * count;
+				map[height][width] += (c - 48);
+				count = 10;
+			}
+		} while (c != EOF);
+	}
+	fclose(fp);
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdshow)
 {
@@ -173,6 +201,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	//메시지 처리하기
 	switch (uMsg) {
 	case WM_CREATE:
+		// Map Init
+		CreateMapFile();
+
+
 		SetTimer(hWnd, 0/*uIDEvent*/, 50/*uElapse*/, OnTimer);
 
 #ifdef _DEBUG

@@ -29,6 +29,7 @@ using namespace std;
 
 #define MAINMENU	0
 #define INGAME		1
+#define TILEWIDTH   32
 
 // SERVER GLOBAL
 extern SOCKET	g_mysocket;
@@ -73,3 +74,4 @@ extern int	  g_TopY;
 extern TCHAR str[CHAT_LENGTH];
 extern SIZE lensize;
 extern vector<wstring> vOutput;
+extern int map[300][300];
