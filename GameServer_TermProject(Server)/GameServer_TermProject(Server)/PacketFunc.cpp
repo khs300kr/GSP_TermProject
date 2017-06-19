@@ -45,6 +45,19 @@ void SendLoginFail(int client, int ojbect)
 	Send_Packet(client, &packet);
 }
 
+void SendCharDBinfo(int client, int object)
+{
+	sc_packet_char_dbinfo packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_CHAR_DBINFO;
+	packet.Level = g_Clients[object].m_Level;
+	packet.Exp = g_Clients[object].m_Exp;
+	packet.HP = g_Clients[object].m_HP;
+	packet.ATT = g_Clients[object].m_ATT;
+	packet.Gold = g_Clients[object].m_Gold;
+
+	Send_Packet(client, &packet);
+}
 
 void SendPutPlayerPacket(int client, int object)
 {
@@ -77,6 +90,24 @@ void SendRemovePlayerPacket(int client, int object)
 	packet.id = object;
 	packet.size = sizeof(packet);
 	packet.type = SC_REMOVE_OBJECT;
+
+	Send_Packet(client, &packet);
+}
+void SendChatPacket(int client, WCHAR id[], WCHAR message[])
+{
+	sc_packet_chat packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_CHAT;
+	wcsncpy_s(packet.char_id, id,MAX_ID_LEN);
+	wcsncpy_s(packet.message, message, MAX_STR_SIZE);
+	Send_Packet(client, &packet);
+}
+void SendAttackPacket(int client, int object)
+{
+	sc_packet_attack packet;
+	packet.id = object;
+	packet.size = sizeof(packet);
+	packet.type = SC_ATTACK;
 
 	Send_Packet(client, &packet);
 }
@@ -183,17 +214,52 @@ void ProcessPacket(int id, unsigned char packet[])
 	case CS_LOGIN:
 	{
 		cs_packet_login* my_packet = reinterpret_cast<cs_packet_login*>(packet);
-		wcout << my_packet->GAME_ID << endl;
+		//wcout << "LOGIN : " << my_packet->GAME_ID << endl;
 		Client_Login(my_packet->GAME_ID, id);
 		break;
 	}
 	case CS_LOGOUT:
 	{
 		cs_packet_logout* my_packet = reinterpret_cast<cs_packet_logout*>(packet);
-		wcout << my_packet->GAME_ID << endl;
-		Client_Logout(my_packet->GAME_ID, id);
+		//wcout << "LOGOUT : " << my_packet->GAME_ID << endl;
+		//cout << my_packet->x << endl;
+		//cout << my_packet->y << endl;
+		//cout << (int)my_packet->Level << endl;
+		//cout << my_packet->Exp << endl;
+		//cout << my_packet->HP << endl;
+		//cout << my_packet->ATT << endl;
+		//cout << my_packet->Gold << endl;
+
+		Client_Logout(my_packet->GAME_ID,my_packet->x, my_packet->y,my_packet->Level,
+			my_packet->Exp, my_packet->HP,my_packet->ATT,my_packet->Gold,	id);
 		break;
 	}
+	// INGAME
+	case CS_CHAT:
+	{
+		cs_packet_chat* my_packet = reinterpret_cast<cs_packet_chat*>(packet);
+		
+		for (int i = 0; i < MAX_USER; ++i)
+		{
+			if (g_Clients[i].m_bConnect == true) {
+				if (Is_Close(id, i) == true)
+					SendChatPacket(i, my_packet->char_id,my_packet->message);
+			}
+		}
+
+		break;
+	}
+	case CS_ATTACK:
+	{
+		for (int i = 0; i < MAX_USER; ++i)
+		{
+			if (g_Clients[i].m_bConnect == true) {
+				if (Is_Close(id, i) == true)
+					SendAttackPacket(i, id);
+			}
+		}
+	}
+	break;
 	default: std::cout << "Unknown Packet Type from Client : " << id << std::endl;
 		while (true);
 	}

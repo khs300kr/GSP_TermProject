@@ -1,8 +1,13 @@
+#include "Global.h"
 #include "MessageProc.h"
 
 HBITMAP hBackGround{};
 HBITMAP hPlayer{};
 HBITMAP hOther{};
+HBITMAP hMainMenu{};
+wstring chat_maker;
+int iLine;
+int iFrontRange;
 
 void OnCreate(HINSTANCE g_hInst, HWND hWnd)
 {
@@ -14,46 +19,88 @@ void OnCreate(HINSTANCE g_hInst, HWND hWnd)
 	//		sector[i][j].m_iY = iHeight;
 	//		if (iWidth)
 	//			iWidth += 50;
-
 	//	}
 	//}
-	hBackGround = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP2));
+	hBackGround = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP1));
 	hPlayer = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP3));
 	hOther = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP4));
+	hMainMenu = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP5));
 }
 
 
 void OnRender(HWND hWnd, HDC hDC, HDC memdc)
 {
-	SelectObject(memdc, hBackGround);
-	StretchBlt(hDC, g_LeftX, g_TopY, g_LeftX + 640, g_TopY + 640, memdc, 0, 0,1008,689, SRCCOPY);
+	HFONT hFont{}, hOldFont{};
+	hFont = CreateFont(20, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("휴먼편지체"));
+	hOldFont = (HFONT)SelectObject(hDC, hFont);
 
-	// Draw Grid
-	for (int i = 0; i < 20; ++i)
+	if (g_GameScene == MAINMENU)
 	{
-		// 가로줄
-		MoveToEx(hDC, 0, 640 * i / 20, NULL);
-		LineTo(hDC, 640, 640 * i / 20);
-		// 세로줄
-		MoveToEx(hDC, 640 * i / 20, 0, NULL);
-		LineTo(hDC, 640 * i / 20, 640);
-	}
+		SelectObject(memdc, hMainMenu);
+		BitBlt(hDC, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memdc, 0, 0, SRCCOPY);
 
-	SelectObject(memdc, hPlayer);
-	if(g_Player.m_bConnected == true)
-		TransparentBlt(hDC, (g_Player.m_iX * 32) - 7, (g_Player.m_iY * 32) - 21, 46, 51, memdc, (g_Player.m_iFrameX * 46),
+		SetBkMode(hDC, TRANSPARENT);
+		SetTextColor(hDC, RGB(255, 255, 255));
+		TextOut(hDC, 430, 455, str, int(wcslen(str)));
+	}
+	if (g_GameScene == INGAME)
+	{
+		// Temporary Map
+		SelectObject(memdc, hBackGround);
+		// Temp
+		//StretchBlt(hDC, g_LeftX, g_TopY, g_LeftX + 640, g_TopY + 640, memdc, 0, 0, 1008, 689, SRCCOPY);
+		// Back
+		BitBlt(hDC, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memdc, 0, 0, SRCCOPY);
+		
+		// UI Draw
+		SetBkMode(hDC, TRANSPARENT);
+		SetTextColor(hDC, RGB(255, 255, 255));
+		TextOut(hDC, 700, 550, g_Player.ID, int(wcslen(g_Player.ID)));
+		TextOut(hDC, 745, 574, to_wstring(g_Player.m_Level).c_str(), int(to_wstring(g_Player.m_Level).size()));
+		TextOut(hDC, 700, 596, to_wstring(g_Player.m_HP).c_str(), int(to_wstring(g_Player.m_HP).size()));
+		TextOut(hDC, 823, 596, to_wstring(g_Player.m_ATT).c_str(), int(to_wstring(g_Player.m_ATT).size()));
+		TextOut(hDC, 715, 618, to_wstring(g_Player.m_Exp).c_str(), int(to_wstring(g_Player.m_Exp).size()));
+		TextOut(hDC, 840, 618, to_wstring(g_Player.m_Gold).c_str(), int(to_wstring(g_Player.m_Gold).size()));
+		TextOut(hDC, 680, 642, to_wstring(g_Player.m_iX).c_str(), int(to_wstring(g_Player.m_iX).size()));
+		TextOut(hDC, 780, 642, to_wstring(g_Player.m_iY).c_str(), int(to_wstring(g_Player.m_iY).size()));
+		// UI Draw(Chat)
+		vector<wstring>::iterator iter = vOutput.begin() + iFrontRange;
+		for (int i = 0; iter != vOutput.end() ; ++iter, ++i)
+		{
+			TextOut(hDC, 643, 400 + (i * 20), iter->c_str(), int(wcslen(iter->c_str())));
+		}
+
+
+		SetTextColor(hDC, RGB(0, 0, 0));
+		TextOut(hDC, 5, 645, str, int(wcslen(str)));
+
+
+
+		// Grid Draw
+		for (int i = 0; i < 20; ++i)
+		{
+			// 가로줄
+			MoveToEx(hDC, 0, 640 * i / 20, NULL);
+			LineTo(hDC, 640, 640 * i / 20);
+			// 세로줄
+			MoveToEx(hDC, 640 * i / 20, 0, NULL);
+			LineTo(hDC, 640 * i / 20, 640);
+		}
+
+		// Object Draw
+		SelectObject(memdc, hPlayer);
+		if (g_Player.m_bConnected == true)
+			TransparentBlt(hDC, (g_Player.m_iX * 32) - 7, (g_Player.m_iY * 32) - 21, 46, 51, memdc, (g_Player.m_iFrameX * 46),
 			(g_Player.m_iFrameY * 51), 46, 51, RGB(255, 0, 255));
 
-	SelectObject(memdc, hOther);
-	for (int i = 0; i < MAX_USER; ++i)
-	{
-		if(g_OtherPlayer[i].m_bConnected == true)
-			TransparentBlt(hDC, (g_OtherPlayer[i].m_iX * 32) - 7, (g_OtherPlayer[i].m_iY * 32) - 21, 46, 51, memdc, (g_OtherPlayer[i].m_iFrameX * 48),
+		SelectObject(memdc, hOther);
+		for (int i = 0; i < MAX_USER; ++i)
+		{
+			if (g_OtherPlayer[i].m_bConnected == true)
+				TransparentBlt(hDC, (g_OtherPlayer[i].m_iX * 32) - 7, (g_OtherPlayer[i].m_iY * 32) - 21, 46, 51, memdc, (g_OtherPlayer[i].m_iFrameX * 48),
 				(g_OtherPlayer[i].m_iFrameY * 50), 48, 50, RGB(255, 0, 255));
-
+		}
 	}
-
-
 }
 
 void OnPacket(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -76,7 +123,7 @@ void OnPacket(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void OnDestory(HWND hWnd)
 {
-	DeleteObject(hBackGround);
+	DeleteObject(hMainMenu); DeleteObject(hBackGround);
 	DeleteObject(hPlayer); 	DeleteObject(hOther);
 
 	KillTimer(hWnd, 0/*uIDEvent*/);
@@ -90,12 +137,25 @@ void ProcessPacket(char *ptr)
 	{
 	case SC_LOGIN_FAIL:
 	{
-		cout << "로그인 실패 다시 입력해주세요. \n";
+		cout << "접속중입니다 다른 아이디로 로그인 해주세요. \n";
+		break;
+	}
+	case SC_CHAR_DBINFO:
+	{
+		sc_packet_char_dbinfo *my_packet = reinterpret_cast<sc_packet_char_dbinfo *>(ptr);
+		g_Player.m_Level = my_packet->Level;
+		g_Player.m_Exp = my_packet->Exp;
+		g_Player.m_HP = my_packet->HP;
+		g_Player.m_ATT = my_packet->ATT;
+		g_Player.m_Gold = my_packet->Gold;
 		break;
 	}
 	case SC_PUT_PLAYER:
 	{
+		// 로그인 성공 처리.
 		cout << "로그인 성공.\n";
+		g_GameScene = INGAME;
+
 		sc_packet_put_player *my_packet = reinterpret_cast<sc_packet_put_player *>(ptr);
 		int id = my_packet->id;
 		if (first_time) {
@@ -108,16 +168,12 @@ void ProcessPacket(char *ptr)
 			g_Player.m_iX = my_packet->x;
 			g_Player.m_iY = my_packet->y;
 			g_Player.m_iFrameY = my_packet->dir;
-			//g_Player.m_iFrameY = my_packet->dir;
-			//player.attr |= BOB_ATTR_VISIBLE;
 		}	
 		else if (id < NPC_START) {
 			g_OtherPlayer[id].m_bConnected = true;
 			g_OtherPlayer[id].m_iX = my_packet->x;
 			g_OtherPlayer[id].m_iY = my_packet->y;
 			g_OtherPlayer[id].m_iFrameY = my_packet->dir;
-
-			//skelaton[id].attr |= BOB_ATTR_VISIBLE;
 		}
 		//else {
 		//	npc[id - NPC_START].x = my_packet->x;
@@ -141,32 +197,42 @@ void ProcessPacket(char *ptr)
 		}
 		else if (other_id < NPC_START) {
 			g_OtherPlayer[other_id].m_bConnected = false;
-
 		}
 		//else {
 		//	npc[other_id - NPC_START].attr &= ~BOB_ATTR_VISIBLE;
 		//}
 		break;
 	}
-	//case SC_CHAT:
-	//{
-	//	sc_packet_chat *my_packet = reinterpret_cast<sc_packet_chat *>(ptr);
-	//	int other_id = my_packet->id;
-	//	if (other_id == g_myid) {
-	//		wcsncpy_s(player.message, my_packet->message, 256);
-	//		player.message_time = GetTickCount();
-	//	}
-	//	else if (other_id < NPC_START) {
-	//		wcsncpy_s(skelaton[other_id].message, my_packet->message, 256);
-	//		skelaton[other_id].message_time = GetTickCount();
-	//	}
-	//	else {
-	//		wcsncpy_s(npc[other_id - NPC_START].message, my_packet->message, 256);
-	//		npc[other_id - NPC_START].message_time = GetTickCount();
-	//	}
-	//	break;
+	case SC_CHAT:
+	{
+		sc_packet_chat *my_packet = reinterpret_cast<sc_packet_chat *>(ptr);
+		chat_maker = my_packet->char_id;
+		chat_maker += L" : ";
+		chat_maker += my_packet->message;
+		vOutput.push_back(chat_maker);
+		chat_maker.clear();
 
-	//}
+		if (iLine >= 7)
+			++iFrontRange;
+		else ++iLine;
+
+		break;
+	}
+	case SC_ATTACK:
+	{
+		sc_packet_attack *my_packet = reinterpret_cast<sc_packet_attack *>(ptr);
+		cout << "ATT" << endl;
+		int id = my_packet->id;
+		if (id == g_myid)
+		{
+			g_Player.m_bAttack = true;
+		}
+		else if (id != g_myid)
+		{
+			g_OtherPlayer[id].m_bAttack = true;
+		}
+		break;
+	}
 	default:
 		printf("Unknown PACKET type [%d]\n", ptr[1]);
 	}
@@ -207,11 +273,6 @@ void SetPlayerPosition(int dir, char *ptr)
 	sc_packet_pos *my_packet = reinterpret_cast<sc_packet_pos *>(ptr);
 	int other_id = my_packet->id;
 	if (other_id == g_myid) {
-		cout << "MyPOS" << endl;
-		cout << (int)my_packet->x << endl;
-		cout << (int)my_packet->y << endl;
-		cout << g_Player.m_iFrameY << endl;
-		
 		g_Player.m_iFrameY = dir;
 		g_Player.m_iX = my_packet->x;
 		g_Player.m_iY = my_packet->y;

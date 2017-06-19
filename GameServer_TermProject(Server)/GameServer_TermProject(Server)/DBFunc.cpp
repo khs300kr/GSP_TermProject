@@ -77,9 +77,15 @@ void Client_Login(WCHAR id[], int ci)
 				// 초기위치
 				g_Clients[ci].m_iX = iXPos;
 				g_Clients[ci].m_iY = iYPos;
+				g_Clients[ci].m_Level = iLevel;
+				g_Clients[ci].m_Exp = iExp;
+				g_Clients[ci].m_HP = iHP;
+				g_Clients[ci].m_ATT = iATT;
+				g_Clients[ci].m_Gold = iGold;
 
 				// 위치 하기.
 				SendPutPlayerPacket(ci, ci);
+				SendCharDBinfo(ci, ci);
 
 				std::unordered_set<int> local_my_view_list;
 
@@ -124,7 +130,7 @@ void Client_Login(WCHAR id[], int ci)
 	}
 }
 
-void Client_Logout(WCHAR id[], int ci)
+void Client_Logout(WCHAR id[],WORD x, WORD y, BYTE Level, WORD Exp, WORD HP, WORD ATT, int gold, int ci)
 {
 	// Connect to data source  
 	retcode = SQLConnect(hdbc, (SQLWCHAR*)L"2012182008", SQL_NTS, (SQLWCHAR*)NULL, 0, NULL, 0);
@@ -133,8 +139,12 @@ void Client_Logout(WCHAR id[], int ci)
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 	{
 		retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+		
 		wstring user_id{ id };
-		sql_query = L"EXEC dbo.client_logout " + user_id;
+		sql_query = L"EXEC dbo.client_logout " + user_id + L","
+			+ to_wstring(x) + L"," + to_wstring(y) + L"," + to_wstring(Level) + L","
+			+ to_wstring(Exp) + L"," + to_wstring(HP) + L"," + to_wstring(ATT) + L","
+			+ to_wstring(gold);
 
 		retcode = SQLExecDirect(hstmt, (wchar_t*)sql_query.c_str(), SQL_NTS);
 

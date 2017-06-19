@@ -4,19 +4,19 @@
 
 // Global_Variables
 HINSTANCE g_hInst;
-HWND hChat{};
 HWND g_hWnd;
+HWND hChat{};
 
 // Chat_Variables
 #define ID_EDIT 100
-#define CHAT_LENGTH 50
 WNDPROC wpOldEditProc;
-TCHAR str[CHAT_LENGTH];
 
 // Window_Variables
 void CALLBACK OnTimer(HWND hWnd, UINT uMsg, UINT_PTR uIDEvent, DWORD dwTime);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK EditProc(HWND, UINT, WPARAM, LPARAM);
+
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdshow)
 {
@@ -75,24 +75,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdPa
 	recv_wsabuf.buf = recv_buffer;
 	recv_wsabuf.len = BUF_SIZE;
 
-	while (true) {
-		if (g_login == false)
-		{
-			cout << g_login << endl;
-			cout << "ID를 입력하세요 : ";
-			wcin >> g_Player.ID;
-			cs_packet_login *my_packet = reinterpret_cast<cs_packet_login*>(send_buffer);
-			my_packet->size = sizeof(cs_packet_login);
-			send_wsabuf.len = sizeof(cs_packet_login);
-			DWORD iobyte;
-			my_packet->type = CS_LOGIN;
-			wcsncpy_s(my_packet->GAME_ID, g_Player.ID, MAX_ID_LEN);
-			WSASend(g_mysocket, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
-		}
-		else
-			break;
-	}
-	//
 	while (GetMessage(&Message, 0, 0, 0)) {
 		TranslateMessage(&Message);
 		DispatchMessage(&Message);
@@ -109,20 +91,46 @@ LRESULT CALLBACK EditProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
  {
 	switch (msg)
 	{
-	case WM_KEYDOWN:
+	case WM_CHAR:
 		{
-			if (wParam == VK_RETURN)
+			if (g_GameScene == MAINMENU && wParam == VK_RETURN)
 			{
-			// The user pressed Enter, so set the focus to the other control
-			// on the window (where 'hwndOther' is a handle to that window).
-			SetFocus(g_hWnd);
-			memset(str, '\0', sizeof(str));
-			SetWindowTextW(hWnd, '\0');
-			// Indicate that we processed the message.
-			return 0;
+				if (wcslen(str) < 10)	// 글자수 제한 (10글자)
+				{
+					cs_packet_login *my_packet = reinterpret_cast<cs_packet_login*>(send_buffer);
+					my_packet->size = sizeof(cs_packet_login);
+					send_wsabuf.len = sizeof(cs_packet_login);
+					DWORD iobyte;
+					my_packet->type = CS_LOGIN;
+					wcsncpy_s(my_packet->GAME_ID, str, MAX_ID_LEN);
+					WSASend(g_mysocket, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+					wcsncpy_s(g_Player.ID, str, MAX_ID_LEN); // 내 ID 저장.
+				}
+				SetWindowTextW(hWnd, '\0');
+				memset(str, '\0', sizeof(str));
+				SetFocus(g_hWnd);
+				return 0;
 			}
-		}
-	}
+			if (g_GameScene == INGAME &&wParam == VK_RETURN)
+			{
+				if (wcslen(str) < MAX_STR_SIZE)
+				{
+					cs_packet_chat *my_packet = reinterpret_cast<cs_packet_chat*>(send_buffer);
+					my_packet->size = sizeof(cs_packet_chat);
+					send_wsabuf.len = sizeof(cs_packet_chat);
+					DWORD iobyte;
+					my_packet->type = CS_CHAT;
+					wcsncpy_s(my_packet->message, str, MAX_STR_SIZE);
+					wcsncpy_s(my_packet->char_id, g_Player.ID, MAX_ID_LEN);
+					WSASend(g_mysocket, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+				}
+				SetWindowTextW(hWnd, '\0');
+				memset(str, '\0', sizeof(str));
+				SetFocus(g_hWnd);
+				return 0;
+			}
+		} // WM_KEYDOWN
+	} // switch msg
 	// Pass the messages we don't process here on to the
 	// original window procedure for default handling.
 	return CallWindowProc(wpOldEditProc, hWnd, msg, wParam, lParam);
@@ -130,7 +138,27 @@ LRESULT CALLBACK EditProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void CALLBACK OnTimer(HWND hWnd, UINT uMsg, UINT_PTR uIDEvent, DWORD dwTime)
 {
+	if (g_Player.m_bAttack) {
+		++g_Player.m_iFrameX;
+		if (g_Player.m_iFrameX == 4)
+		{
+			g_Player.m_iFrameX = 0;
+			g_Player.m_bAttack = false;
+		}
+	}
+	
+	for (int i = 0; i < MAX_USER; ++i)
+	{
+		if (g_OtherPlayer[i].m_bAttack) {
+			++g_OtherPlayer[i].m_iFrameX;
+			if (g_OtherPlayer[i].m_iFrameX == 4)
+			{
+				g_OtherPlayer[i].m_iFrameX = 0;
+				g_OtherPlayer[i].m_bAttack = false;
+			}
 
+		}
+	}
 	InvalidateRect(hWnd, NULL, FALSE);
 }
 
@@ -145,7 +173,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	//메시지 처리하기
 	switch (uMsg) {
 	case WM_CREATE:
-		SetTimer(hWnd, 0/*uIDEvent*/, 20/*uElapse*/, OnTimer);
+		SetTimer(hWnd, 0/*uIDEvent*/, 50/*uElapse*/, OnTimer);
 
 #ifdef _DEBUG
 		// Console Print
@@ -156,7 +184,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		// Chatting
 		hChat = CreateWindow(L"edit", NULL, WS_CHILD | WS_VISIBLE | WS_BORDER |
-			ES_AUTOHSCROLL, 80, 300, 200, 25, hWnd, (HMENU)ID_EDIT, g_hInst, NULL);
+			ES_AUTOHSCROLL, 2000, 2000, 200, 25, hWnd, (HMENU)ID_EDIT, g_hInst, NULL);
 		PostMessage(hChat, EM_LIMITTEXT, (WPARAM)49, 0);
 		wpOldEditProc = (WNDPROC)SetWindowLongPtr(hChat,
 			GWLP_WNDPROC,
@@ -204,39 +232,55 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_KEYDOWN: 
 	{
-		int x = 0, y = 0;
-		if (wParam == VK_RIGHT)	x += 1;
-		if (wParam == VK_LEFT)	x -= 1;
-		if (wParam == VK_UP)	y -= 1;
-		if (wParam == VK_DOWN)	y += 1;
-		cs_packet_up *my_packet = reinterpret_cast<cs_packet_up *>(send_buffer);
-		my_packet->size = sizeof(my_packet);
-		send_wsabuf.len = sizeof(my_packet);
-		DWORD iobyte;
-		if (x != 0) 
+		if (wParam == VK_RIGHT || wParam == VK_LEFT || wParam == VK_UP || wParam == VK_DOWN)
 		{
-			if (x == 1) my_packet->type = CS_RIGHT;
-			else my_packet->type = CS_LEFT;
-			int ret = WSASend(g_mysocket, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
-			if (ret) {
-				int error_code = WSAGetLastError();
-				printf("Error while sending packet [%d]", error_code);
+			int x = 0, y = 0;
+			switch (wParam)
+			{
+				case VK_RIGHT: x += 1; break;
+				case VK_LEFT: x -= 1; break;
+				case VK_UP: y -= 1; break;
+				case VK_DOWN : y += 1; break;
 			}
-		}
-		if (y != 0) 
-		{
-			if (y == 1) my_packet->type = CS_DOWN;
-			else my_packet->type = CS_UP;
-			int ret = WSASend(g_mysocket, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
-			if (ret) {
-				int error_code = WSAGetLastError();
-				printf("Error while sending packet [%d]", error_code);
+			cs_packet_up *my_packet = reinterpret_cast<cs_packet_up *>(send_buffer);
+			my_packet->size = sizeof(my_packet);
+			send_wsabuf.len = sizeof(my_packet);
+			DWORD iobyte;
+			if (x != 0)
+			{
+				if (x == 1) my_packet->type = CS_RIGHT;
+				else my_packet->type = CS_LEFT;
+				int ret = WSASend(g_mysocket, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+				if (ret) {
+					int error_code = WSAGetLastError();
+					printf("Error while sending packet [%d]", error_code);
+				}
+			}
+			if (y != 0)
+			{
+				if (y == 1) my_packet->type = CS_DOWN;
+				else my_packet->type = CS_UP;
+				int ret = WSASend(g_mysocket, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+				if (ret) {
+					int error_code = WSAGetLastError();
+					printf("Error while sending packet [%d]", error_code);
+				}
 			}
 		}
 		if (wParam == VK_RETURN)
 		{
 			SetFocus(hChat);
 			InvalidateRect(g_hWnd, NULL, false);
+		}
+		if (g_GameScene == INGAME && (wParam == 'a' || wParam == 'A' ))
+		{
+			cs_packet_attack *my_packet = reinterpret_cast<cs_packet_attack*>(send_buffer);
+			my_packet->size = sizeof(cs_packet_attack);
+			send_wsabuf.len = sizeof(cs_packet_attack);
+			DWORD iobyte;
+			my_packet->type = CS_ATTACK;
+
+			WSASend(g_mysocket, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
 		}
 	}
 		break;
@@ -248,20 +292,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			switch (HIWORD(wParam))
 			{
 			case EN_CHANGE:
-				//if (gGameFramework.ChangeScene == LOBBY)
-				//{
-				//	if (!gLobby.RoomCreateWindow)
-				//		GetWindowText(hChat, gLobby.input, sizeof(gLobby.input));
-				//	else
-				//	{
-				//		if (gLobby.RoomCreateChat == gLobby.RNAME)
-				//			GetWindowText(hChat, gLobby.RoomName, sizeof(gLobby.RoomName));
-				//	}
-				//}
-				//else if (gGameFramework.ChangeScene == ROOM)
-				//{
-				//	GetWindowText(hChat, gRoom.input, sizeof(gRoom.input));
-				//}
+
 				GetWindowText(hChat, str, sizeof(str));
 				
 				break;
@@ -274,13 +305,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_CLOSE:
 	{
-		cs_packet_logout *my_packet = reinterpret_cast<cs_packet_logout*>(send_buffer);
-		my_packet->size = sizeof(cs_packet_logout);
-		send_wsabuf.len = sizeof(cs_packet_logout);
-		DWORD iobyte;
-		my_packet->type = CS_LOGOUT;
-		wcsncpy_s(my_packet->GAME_ID, g_Player.ID, MAX_ID_LEN);
-		WSASend(g_mysocket, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+		if (g_Player.ID[0] != '\0' && g_Player.m_Level != 0)
+		{
+			cs_packet_logout *my_packet = reinterpret_cast<cs_packet_logout*>(send_buffer);
+			my_packet->size = sizeof(cs_packet_logout);
+			send_wsabuf.len = sizeof(cs_packet_logout);
+			DWORD iobyte;
+			my_packet->type = CS_LOGOUT;
+			wcsncpy_s(my_packet->GAME_ID, g_Player.ID, MAX_ID_LEN);
+			my_packet->x = g_Player.m_iX;
+			my_packet->y = g_Player.m_iY;
+			my_packet->Level = g_Player.m_Level;
+			my_packet->Exp = g_Player.m_Exp;
+			my_packet->HP = g_Player.m_HP;
+			my_packet->ATT = g_Player.m_ATT;
+			my_packet->Gold = g_Player.m_Gold;
+
+			WSASend(g_mysocket, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+		}
 		break;
 	}
 

@@ -1,5 +1,4 @@
 #pragma once
-#include "Global.h"
 void OnCreate(HINSTANCE g_hInst, HWND hWnd);
 void OnRender(HWND hWnd, HDC hDC, HDC memdc);
 void OnPacket(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

@@ -26,12 +26,19 @@ struct CLIENT
 	bool			m_bConnect;
 	SOCKET			m_client_socket;
 	OverlappedEx	m_recv_over;
+	// Char_info
+	BYTE			m_Level;
+	WORD			m_Exp;
+	WORD			m_HP;
+	WORD			m_ATT;
+	int				m_Gold;
+
 	// recv의 조립 버퍼.
 	unsigned char	packet_buf[MAX_PACKET_SIZE];
 	// 조립을 위한 데이터.
 	int prev_packet_data;	// 조립 중 데이터
 	int curr_packet_size;	// 받은 양
-							// 시야구현
+	// 시야구현
 	std::unordered_set <int> view_list;
 	std::mutex vl_lock;
 };

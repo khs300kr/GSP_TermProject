@@ -20,3 +20,9 @@ bool g_login{};
 
 int	   g_LeftX{};
 int	   g_TopY{};
+int	   g_GameScene{};
+
+// CHAT
+TCHAR str[CHAT_LENGTH]{};
+SIZE  lensize{};
+vector<wstring> vOutput{};

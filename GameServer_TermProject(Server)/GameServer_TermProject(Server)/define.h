@@ -10,9 +10,9 @@
 #include <vector>
 #include <unordered_set>				// order가 필요없으면 성능 향상
 #include <mutex>
+#include <string>
 #include "protocol.h"
 
 // DB
-#define UNICODE
 #include <sqlext.h>
 using namespace std;

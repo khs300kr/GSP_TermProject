@@ -13,7 +13,7 @@
 
 #define MY_SERVER_PORT  7000
 
-#define MAX_STR_SIZE  100
+#define MAX_STR_SIZE  50
 #define MAX_ID_LEN 10
 
 
@@ -38,8 +38,8 @@
 #define SC_STAT_CHANGE   7
 #define SC_ADD_OBJECT    8
 #define SC_REMOVE_OBJECT 9
-
-
+#define SC_CHAR_DBINFO	 10
+#define SC_ATTACK		 11	
 
 #pragma pack (push, 1)
 
@@ -59,12 +59,25 @@ struct cs_packet_logout {
 	BYTE size;
 	BYTE type;
 	WCHAR GAME_ID[MAX_ID_LEN];
+	WORD x;
+	WORD y;
+	BYTE Level;
+	WORD Exp;
+	WORD HP;
+	WORD ATT;
+	int Gold;
 };
 
 struct cs_packet_chat {
 	BYTE size;
 	BYTE type;
 	WCHAR message[MAX_STR_SIZE];
+	WCHAR char_id[MAX_ID_LEN];
+};
+
+struct cs_packet_attack {
+	BYTE size;
+	BYTE type;
 };
 
 // Server -> Client
@@ -90,6 +103,17 @@ struct sc_packet_put_player {
 	WORD y;
 	BYTE dir;
 };
+
+struct sc_packet_char_dbinfo {
+	BYTE size;
+	BYTE type;
+	BYTE Level;
+	WORD Exp;
+	WORD HP;
+	WORD ATT;
+	BYTE Gold;
+};
+
 struct sc_packet_remove_player {
 	BYTE size;
 	BYTE type;
@@ -99,8 +123,14 @@ struct sc_packet_remove_player {
 struct sc_packet_chat {
 	BYTE size;
 	BYTE type;
-	WORD id;
 	WCHAR message[MAX_STR_SIZE];
+	WCHAR char_id[MAX_ID_LEN];
+};
+
+struct sc_packet_attack {
+	BYTE size;
+	BYTE type;
+	WORD id;
 };
 
 #pragma pack (pop)

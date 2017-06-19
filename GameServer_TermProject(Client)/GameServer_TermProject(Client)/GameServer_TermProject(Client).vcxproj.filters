@@ -60,5 +60,11 @@
     <Image Include="Resources\Other.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="resources\bitmap5.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\MainMenu.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
 </Project>
