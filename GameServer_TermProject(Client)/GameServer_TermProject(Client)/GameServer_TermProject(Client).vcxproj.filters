@@ -69,5 +69,8 @@
     <Image Include="Resources\tile.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="Resources\Monster.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
 </Project>

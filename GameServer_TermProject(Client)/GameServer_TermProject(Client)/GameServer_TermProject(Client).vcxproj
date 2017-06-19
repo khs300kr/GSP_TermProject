@@ -158,6 +158,7 @@
     <Image Include="resources\bitmap5.bmp" />
     <Image Include="Resources\black.bmp" />
     <Image Include="Resources\MainMenu.bmp" />
+    <Image Include="Resources\Monster.bmp" />
     <Image Include="Resources\Other.bmp" />
     <Image Include="Resources\Player.bmp" />
     <Image Include="Resources\temp_map.bmp" />

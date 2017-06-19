@@ -71,15 +71,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\Lincoln\Desktop\GSP_TermProject\GameServer_TermProject%28Server%29\GameServer_TermProject%28Server%29\include;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Users\Lincoln\Desktop\GSP_TermProject\GameServer_TermProject%28Server%29\GameServer_TermProject%28Server%29\lib;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\Lincoln\Desktop\GSP_TermProject\GameServer_TermProject%28Server%29\GameServer_TermProject%28Server%29\include;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Users\Lincoln\Desktop\GSP_TermProject\GameServer_TermProject%28Server%29\GameServer_TermProject%28Server%29\lib;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\Lincoln\Desktop\GSP_TermProject\GameServer_TermProject%28Server%29\GameServer_TermProject%28Server%29\include;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Users\Lincoln\Desktop\GSP_TermProject\GameServer_TermProject%28Server%29\GameServer_TermProject%28Server%29\lib;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\Lincoln\Desktop\GSP_TermProject\GameServer_TermProject%28Server%29\GameServer_TermProject%28Server%29\include;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Users\Lincoln\Desktop\GSP_TermProject\GameServer_TermProject%28Server%29\GameServer_TermProject%28Server%29\lib;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -92,6 +100,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>lua5.1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Lincoln\Desktop\GSP_TermProject\GameServer_TermProject%28Server%29\GameServer_TermProject%28Server%29\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -105,6 +115,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>lua5.1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Lincoln\Desktop\GSP_TermProject\GameServer_TermProject%28Server%29\GameServer_TermProject%28Server%29\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -122,6 +134,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>lua5.1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Lincoln\Desktop\GSP_TermProject\GameServer_TermProject%28Server%29\GameServer_TermProject%28Server%29\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,22 +153,31 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>lua5.1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Lincoln\Desktop\GSP_TermProject\GameServer_TermProject%28Server%29\GameServer_TermProject%28Server%29\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AStar.cpp" />
     <ClCompile Include="DBFunc.cpp" />
     <ClCompile Include="Global.cpp" />
+    <ClCompile Include="lua_tinker.cpp" />
     <ClCompile Include="PacketFunc.cpp" />
     <ClCompile Include="server_main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AStar.hpp" />
     <ClInclude Include="DBFunc.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="Global.h" />
+    <ClInclude Include="lua_tinker.h" />
     <ClInclude Include="PacketFunc.h" />
     <ClInclude Include="protocol.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="monster.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

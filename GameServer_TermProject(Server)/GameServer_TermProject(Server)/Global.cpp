@@ -16,10 +16,13 @@ void error_display(char *msg, int err_no)
 	while (true);
 }
 
+priority_queue<Timer_Event, vector<Timer_Event>, comparison> timer_queue{};
+std::mutex timerqueue_lock{};
+
 // Server
 HANDLE g_Hiocp{};
 SOCKET g_ServerSocket{};
-CLIENT g_Clients[MAX_USER]{};
+CLIENT g_Clients[NUM_OF_NPC]{};
 
 // DB
 SQLHENV henv{};
@@ -29,7 +32,7 @@ SQLRETURN retcode{};;
 
 // Map
 int map[300][300]{};
-
+AStar::Generator generator{};
 
 
 void CreateMapFile()

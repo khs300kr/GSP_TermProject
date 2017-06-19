@@ -88,20 +88,15 @@ void Client_Login(WCHAR id[], int ci)
 				SendCharDBinfo(ci, ci);
 
 				std::unordered_set<int> local_my_view_list;
-
 				for (int i = 0; i < MAX_USER; ++i)
-				{
 					if (g_Clients[i].m_bConnect == true)
-					{
-						if (i != ci)
-						{
+						if (i != ci) {
 							if (Is_Close(i, ci) == true) {
 								SendPutPlayerPacket(ci, i);
 								local_my_view_list.insert(i);
 								SendPutPlayerPacket(i, ci);
 								// 나한테 넣는다. (시야리스트)
-								g_Clients[ci].view_list.insert(i);
-
+								//g_Clients[ci].view_list.insert(i);
 								// 나한테만이 아니라 상대방한테도 넣어줘야한다.
 								g_Clients[i].vl_lock.lock();						//lock
 								g_Clients[i].view_list.insert(ci);
@@ -109,11 +104,19 @@ void Client_Login(WCHAR id[], int ci)
 																					// 이렇게하면 처음에 근처에있는 친구들만 보인다.
 							}
 						}
+				for (int i = NPC_START; i< NUM_OF_NPC;++i)
+				{
+					if (true == Is_Close(ci, i)) 
+					{
+						//WakeUpNPC(i);
+						local_my_view_list.insert(i);
+						SendPutPlayerPacket(ci, i);
+						SendMoninfo(ci, i);
 					}
-					g_Clients[ci].vl_lock.lock();					// lock
-					for (auto p : local_my_view_list) g_Clients[ci].view_list.insert(p);
-					g_Clients[ci].vl_lock.unlock();					//unlock
 				}// for loop
+				g_Clients[ci].vl_lock.lock();					// lock
+				for (auto p : local_my_view_list) g_Clients[ci].view_list.insert(p);
+				g_Clients[ci].vl_lock.unlock();					//unlock
 			}
 			else
 			{

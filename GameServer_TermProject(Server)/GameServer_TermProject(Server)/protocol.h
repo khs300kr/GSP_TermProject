@@ -9,12 +9,16 @@
 #define MAX_USER 1000
 
 #define NPC_START  1000
-#define NUM_OF_NPC  10000
+#define NUM_OF_NPC  2000
 
 #define MY_SERVER_PORT  7000
 
 #define MAX_STR_SIZE  50
 #define MAX_ID_LEN 10
+
+#define MONSTER_PEACE 0
+#define MONSTER_MOVE 1
+#define MONSTER_AGGRO 2
 
 
 // Client -> Server
@@ -40,6 +44,7 @@
 #define SC_REMOVE_OBJECT 9
 #define SC_CHAR_DBINFO	 10
 #define SC_ATTACK		 11	
+#define SC_MON_INFO		 12
 
 #pragma pack (push, 1)
 
@@ -102,6 +107,17 @@ struct sc_packet_put_player {
 	WORD x;
 	WORD y;
 	BYTE dir;
+	BYTE mon_type;
+};
+
+struct sc_packet_mon_info {
+	BYTE size;
+	BYTE type;
+	WORD id;
+	BYTE Level;
+	WORD Exp;
+	WORD HP;
+	WORD ATT;
 };
 
 struct sc_packet_char_dbinfo {

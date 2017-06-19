@@ -50,6 +50,8 @@ struct Player {
 	int	m_iFrameY;
 	TCHAR ID[MAX_ID_LEN];
 	bool m_bConnected;	// Hide Or Not
+	// Mon_info
+	BYTE			m_MonType;
 	// Char_info
 	BYTE			m_Level;
 	WORD			m_Exp;
@@ -63,6 +65,7 @@ struct Player {
 extern RECT	  g_windowrect;
 extern Player g_Player;
 extern Player g_OtherPlayer[MAX_USER];
+extern Player npc[NUM_OF_NPC];
 
 extern int	  g_GameScene;
 extern bool	  g_login;

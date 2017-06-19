@@ -15,7 +15,7 @@ int		g_myid{};
 RECT   g_windowrect{};
 Player g_Player{};
 Player g_OtherPlayer[MAX_USER]{};
-
+Player npc[NUM_OF_NPC]{};
 bool g_login{};
 
 int	   g_LeftX{};

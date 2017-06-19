@@ -6,6 +6,7 @@ HBITMAP hPlayer{};
 HBITMAP hOther{};
 HBITMAP hMainMenu{};
 HBITMAP hTile{};
+HBITMAP hMonster{};
 wstring chat_maker;
 int iLine;
 int iFrontRange;
@@ -17,6 +18,7 @@ void OnCreate(HINSTANCE g_hInst, HWND hWnd)
 	hOther = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP4));
 	hMainMenu = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP5));
 	hTile = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP6));
+	hMonster = LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP7));
 }
 
 
@@ -143,6 +145,18 @@ void OnRender(HWND hWnd, HDC hDC, HDC memdc)
 				TransparentBlt(hDC, ((g_OtherPlayer[i].m_iX - g_LeftX) * 32) - 6, ((g_OtherPlayer[i].m_iY - g_TopY) * 32) - 22, 46, 51, memdc, (g_OtherPlayer[i].m_iFrameX * 48),
 				(g_OtherPlayer[i].m_iFrameY * 50), 48, 50, RGB(255, 0, 255));
 		}
+		SelectObject(memdc, hMonster);
+
+		SetTextColor(hDC, RGB(255, 255, 255));
+		for (int i = 0; i < NPC_START; ++i)
+		{
+			if (npc[i].m_bConnected == true) {
+				TransparentBlt(hDC, ((npc[i].m_iX - g_LeftX) * 32) - 2, ((npc[i].m_iY - g_TopY) * 32) - 12, 38, 43, memdc, (npc[i].m_MonType * 64),
+					0, 64, 64, RGB(255, 0, 255));
+				TextOut(hDC, ((npc[i].m_iX - g_LeftX) * 32) + 6, ((npc[i].m_iY - g_TopY) * 32) - 10, 
+					to_wstring(npc[i].m_HP).c_str(), int(to_wstring(npc[i].m_HP).size()));
+			}
+		}
 	}
 }
 
@@ -168,7 +182,7 @@ void OnDestory(HWND hWnd)
 {
 	DeleteObject(hMainMenu); DeleteObject(hBackGround);
 	DeleteObject(hPlayer); 	DeleteObject(hOther);
-	DeleteObject(hTile);
+	DeleteObject(hTile); DeleteObject(hMonster);
 	KillTimer(hWnd, 0/*uIDEvent*/);
 }
 
@@ -183,6 +197,20 @@ void ProcessPacket(char *ptr)
 		cout << "접속중입니다 다른 아이디로 로그인 해주세요. \n";
 		break;
 	}
+	case SC_MON_INFO:
+	{
+		sc_packet_mon_info *my_packet = reinterpret_cast<sc_packet_mon_info *>(ptr);
+		int other_id = my_packet->id;
+		if (other_id == g_myid) {}
+		else if (other_id < NPC_START) {}
+		else {
+			npc[other_id - NPC_START].m_Level = my_packet->Level;
+			npc[other_id - NPC_START].m_Exp = my_packet->Exp;
+			npc[other_id - NPC_START].m_HP = my_packet->HP;
+			npc[other_id - NPC_START].m_ATT = my_packet->ATT;
+		}
+		break;
+	}
 	case SC_CHAR_DBINFO:
 	{
 		sc_packet_char_dbinfo *my_packet = reinterpret_cast<sc_packet_char_dbinfo *>(ptr);
@@ -195,13 +223,10 @@ void ProcessPacket(char *ptr)
 	}
 	case SC_PUT_PLAYER:
 	{
-		// 로그인 성공 처리.
-		cout << "로그인 성공.\n";
-		g_GameScene = INGAME;
-
 		sc_packet_put_player *my_packet = reinterpret_cast<sc_packet_put_player *>(ptr);
 		int id = my_packet->id;
 		if (first_time) {
+			g_GameScene = INGAME;
 			g_login = true;
 			first_time = false;
 			g_myid = id;
@@ -220,11 +245,13 @@ void ProcessPacket(char *ptr)
 			g_OtherPlayer[id].m_iY = my_packet->y;
 			g_OtherPlayer[id].m_iFrameY = my_packet->dir;
 		}
-		//else {
-		//	npc[id - NPC_START].x = my_packet->x;
-		//	npc[id - NPC_START].y = my_packet->y;
-		//	npc[id - NPC_START].attr |= BOB_ATTR_VISIBLE;
-		//}
+		else {
+			npc[id - NPC_START].m_bConnected = true;
+			npc[id - NPC_START].m_MonType = my_packet->mon_type;
+			npc[id - NPC_START].m_iX = my_packet->x;
+			npc[id - NPC_START].m_iY = my_packet->y;
+
+		}
 		break;
 	}
 	//case SC_POS:
@@ -243,9 +270,10 @@ void ProcessPacket(char *ptr)
 		else if (other_id < NPC_START) {
 			g_OtherPlayer[other_id].m_bConnected = false;
 		}
-		//else {
-		//	npc[other_id - NPC_START].attr &= ~BOB_ATTR_VISIBLE;
-		//}
+		else {
+			npc[other_id - NPC_START].m_bConnected = false;
+
+		}
 		break;
 	}
 	case SC_CHAT:
@@ -329,9 +357,9 @@ void SetPlayerPosition(int dir, char *ptr)
 		g_OtherPlayer[other_id].m_iX = my_packet->x;
 		g_OtherPlayer[other_id].m_iY = my_packet->y;
 	}
-	//else {
-	//	npc[other_id - NPC_START].x = my_packet->x;
-	//	npc[other_id - NPC_START].y = my_packet->y;
-	//}
-	//break;
+	else {
+		cout << my_packet->x << "\t" << my_packet->y << endl;
+		npc[other_id - NPC_START].m_iX = my_packet->x;
+		npc[other_id - NPC_START].m_iY = my_packet->y;
+	}
 }
